@@ -1,0 +1,85 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+group = 'com.logicartisan'
+archivesBaseName = 'common-core'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.+';
+
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.+'
+}
+
+
+
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+
+signing {
+    sign configurations.archives
+}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+            
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+            
+            pom.project {
+                name 'LogicArtisan Common Core'
+                packaging 'jar'
+                // optionally artifactId can be defined here 
+                description 'A collection of common utilities and helper functions useful for a wide variety of applications.'
+                url 'https://bitbucket.org/logicartisan/common-core'
+
+                scm {
+                    connection 'scm:git:https://bitbucket.org/logicartisan/common-core.git'
+                    developerConnection 'scm:git:https://bitbucket.org/logicartisan/common-core.git'
+                    url 'https://bitbucket.org/logicartisan/common-core/src'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'robeden'
+                        name 'Rob Eden'
+                        email 'robeden1@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
