@@ -9,7 +9,6 @@ import com.logicartisan.common.core.thread.ThreadKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Queue;
@@ -247,12 +246,7 @@ class ListenerDispatchControl<T, A> implements Runnable {
 
 				case RETRY_MESSAGE:
 					retry_message = true;
-					if ( !SwingUtilities.isEventDispatchThread() ) {
-						ThreadKit.sleep( 2000 );
-					}
-					else {
-						error.printStackTrace();
-					}
+					ThreadKit.sleep( 1000 );
 					break;
 
 				case REMOVE_LISTENER:
