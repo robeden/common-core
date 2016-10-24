@@ -64,7 +64,7 @@ public interface MessageDeliveryErrorHandler<T> {
 
 
 	/**
-	 * Called when & if the last listener is removed.
+	 * Called when/if the last listener is removed.
 	 *
 	 * Note that there is no locking, so there is no guarantee about the CURRENT number of
 	 * listeners. It is guaranteed that the last listener was removed at one point.

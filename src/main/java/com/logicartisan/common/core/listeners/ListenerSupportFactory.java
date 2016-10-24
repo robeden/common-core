@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 /**
  * This class creates instances of {@link ListenerSupport} for managing listeners and
  * dispatching events to them.
- * <p/>
+ * <p></p>
  * There are various options available when creating a ListenerSupport object, but the
  * main decision is whether to dispatch messages synchronously (blocking until all
  * messages have been delivered) or asynchronously (returning immediately and delivering
@@ -20,7 +20,6 @@ import java.util.concurrent.Executor;
  * interact with the dispatcher to get more information. For example, a
  * PropertyChangeListener that will act on an object when it achieves a particular value
  * for a property.</li>
- * <p/>
  * <li>Asynchronous is more appropriate when state is not particularly important, an event
  * contains all the information listeners need, or if calls can be remote or otherwise
  * costly. It is important to note that with asynchronous delivery the same message can

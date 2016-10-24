@@ -81,7 +81,7 @@ public class ObjectSlot<V> implements Supplier<V>, Consumer<V> {
 	}
 
 	/**
-	 * Similar to {@link #compareAndSet(V, V)}, but allows more advanced testing of the
+	 * Similar to {@link #compareAndSet(Object, Object)}, but allows more advanced testing of the
 	 * current value via a predicate.
 	 */
 	public boolean compareAndSet( @Nonnull Predicate<V> update_allowed_test, V update ) {

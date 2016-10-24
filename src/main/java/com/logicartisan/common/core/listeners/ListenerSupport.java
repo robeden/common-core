@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This interface provides management and message dispatching to a set of listeners.
  * Instances are obtained via {@link ListenerSupportFactory}.
- * <p/>
+ * <p></p>
  * There are two kinds of operations on a ListenerSupport object: listener management and
  * message dispatching. Listener management operations are all done directly on the
  * ListenerSupport object using methods such as {@link #add} and {@link #remove}. Message
@@ -20,31 +20,31 @@ import java.util.concurrent.TimeUnit;
  * listener interface will be return and the methods should simply be called directly an
  * they will be sent to all listeners. Note: only methods returning void will be usable
  * via this mechanism.
- * <p/>
+ * <p></p>
  * The following is an example usage:
  * <pre>
  *   class MyClass {
- *      private final ListenerSupport<PropertyChangeListener> listeners =
+ *      private final ListenerSupport&lt;PropertyChangeListener&gt; listeners =
  *         ListenerSupportFactory.create( PropertyChangeListener.class );
- * <p/>
+ *
  *      private String foo;
- * <p/>
+ *
  *      public void setFoo( String foo ) {
  *         String old_foo = this.foo;
  *         this.foo = foo;
  *         listeners.dispatch().propertyChanged(
  *            new PropertyChangeEvent( this, "foo", old_foo, foo ) );
  *      }
- * <p/>
+ *
  *      public String getFoo() {
  *         return foo;
  *      }
- * <p/>
- * <p/>
+ *
+ *
  *      public void addPropertyChangeListener( PropertyChangeListener listener ) {
  *         listeners.addListener( listener );
  *      }
- * <p/>
+ *
  *      public void removePropertyChangeListener( PropertyChangeListener listener ) {
  *         listeners.removeListener( listener );
  *      }
@@ -90,7 +90,7 @@ public interface ListenerSupport<T, A> {
 	 *   ListenerSupport&lt;PropertyChangeListener&gt; support = ...;
 	 *   support.dispatch().propertyChanged( "foo", "old_value", "new_value" );
 	 * </pre>
-	 * <p/>
+	 * <p></p>
 	 * This method will never return null and will not throw exceptions.
 	 */
 	public T dispatch();
