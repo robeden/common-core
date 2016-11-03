@@ -10,6 +10,9 @@ as Guava) or the JDK itself are preferred. As new functionality from
 this library is possible with those it will be migrated out of this
 collection.
 
+[![Javadocs](http://www.javadoc.io/badge/com.logicartisan/common-core.svg)](http://www.javadoc.io/doc/com.logicartisan/common-core)
+
+
 
 Download
 --------
