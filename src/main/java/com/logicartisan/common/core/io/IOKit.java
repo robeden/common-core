@@ -2,7 +2,7 @@
  * Copyright(c) 2002-2016, Rob Eden
  * All rights reserved.
  */
-package com.logicartisan.common.core;
+package com.logicartisan.common.core.io;
 
 import com.logicartisan.common.core.thread.ThreadKit;
 
@@ -11,8 +11,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.text.MessageFormat;
 
 
@@ -96,51 +94,6 @@ public class IOKit {
 		}
 		catch ( IOException ex ) {
 			return false;
-		}
-	}
-
-	/**
-	 * Serialize an object and return the byte array (suitable for storage).
-	 */
-	public static byte[] serialize( Object obj ) throws IOException {
-		ByteArrayOutputStream b_out = null;
-		ObjectOutputStream o_out = null;
-		try {
-			b_out = new ByteArrayOutputStream();
-			o_out = new ObjectOutputStream( b_out );
-			o_out.writeObject( obj );
-			return b_out.toByteArray();
-		}
-		finally {
-			close( ( Closeable ) o_out );
-			close( b_out );
-		}
-	}
-
-	/**
-	 * Serialize an object and return the byte array (suitable for storage).
-	 */
-	public static Object deserialize( byte[] data )
-		throws IOException, ClassNotFoundException {
-
-		Boolean previous_value = IOKit.DESERIALIZATION_HINT.get();
-		IOKit.DESERIALIZATION_HINT.set( Boolean.TRUE );
-		try {
-			ByteArrayInputStream b_in = null;
-			ObjectInputStream o_in = null;
-			try {
-				b_in = new ByteArrayInputStream( data );
-				o_in = new ObjectInputStream( b_in );
-				return o_in.readObject();
-			}
-			finally {
-				close( ( Closeable ) o_in );
-				close( b_in );
-			}
-		}
-		finally {
-			if ( previous_value == null ) IOKit.DESERIALIZATION_HINT.remove();
-			else IOKit.DESERIALIZATION_HINT.set( previous_value );
 		}
 	}
 
@@ -364,25 +317,5 @@ public class IOKit {
 			throw new IOException( ex );
 		}
 		// NOTE: Don't close!
-	}
-
-
-	/**
-	 * Deletes a file or directory, recursively deleting all files in the directory
-	 * first (if applicable). Use with caution (this is "rm -rf")!
-	 */
-	public static void deleteRecursive( File file ) throws IOException {
-		if ( !Files.exists( file.toPath(), LinkOption.NOFOLLOW_LINKS ) ) return;
-
-		if ( file.isDirectory() ) {
-			File[] files = file.listFiles();
-			if ( files != null ) {
-				for( File child : files ) {
-					deleteRecursive( child );
-				}
-			}
-		}
-
-		Files.delete( file.toPath() );
 	}
 }
