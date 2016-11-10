@@ -113,13 +113,24 @@ public class TestIOKit {
 	private static void chop( @Nonnull String string, int length,
 		@Nonnull Consumer<String> handler ) {
 
-		String remaining = string;
-		while( remaining.length() > ( length ) ) {
-			handler.accept( remaining.substring( 0, length ) );
-			remaining = remaining.substring( length );
+		// First split into lines so newline don't muck things up
+		try( BufferedReader reader = new BufferedReader( new StringReader( string ) ) ) {
+			String line;
+			while( ( line = reader.readLine() ) != null ) {
+				String remaining = line;
+				while( remaining.length() > ( length ) ) {
+					handler.accept( remaining.substring( 0, length ) );
+					remaining = remaining.substring( length );
+				}
+				if ( !remaining.isEmpty() ) {
+					handler.accept( remaining );
+				}
+			}
 		}
-		if ( !remaining.isEmpty() ) {
-			handler.accept( remaining );
+		catch ( IOException e ) {
+			// This shouldn't happen
+			throw new IllegalArgumentException(
+				"Unexpected error reading from string", e );
 		}
 	}
 }
