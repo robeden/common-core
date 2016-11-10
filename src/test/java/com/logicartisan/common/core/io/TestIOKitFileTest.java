@@ -33,7 +33,8 @@ public class TestIOKitFileTest {
 
 	@Test
 	public void testWithComment() throws Exception {
-		innerTest( "Test of data, length: " + data.length );
+		innerTest( "Test of data, length: " + data.length +
+			"\n ... and a newline in a comment, because they're kind of hard" );
 	}
 
 	@Test
