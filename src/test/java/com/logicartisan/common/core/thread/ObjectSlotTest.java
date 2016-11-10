@@ -252,6 +252,8 @@ public class ObjectSlotTest {
 
 		ObjectSlot<String> slot = new ObjectSlot<>();
 
+		long start = System.currentTimeMillis();
+
 		SharedThreadPool.INSTANCE.execute( () -> {
 			try {
 				String value = slot.waitForValue();
@@ -265,8 +267,6 @@ public class ObjectSlotTest {
 				value_received_latch.countDown();
 			}
 		} );
-
-		long start = System.currentTimeMillis();
 
 		SharedThreadPool.INSTANCE.schedule( () -> slot.set( "Hi" ), 2, TimeUnit.SECONDS );
 
@@ -303,6 +303,8 @@ public class ObjectSlotTest {
 
 		ObjectSlot<String> slot = new ObjectSlot<>();
 
+		long start = System.currentTimeMillis();
+
 		SharedThreadPool.INSTANCE.execute( () -> {
 			try {
 				String value = slot.waitForValue( 2000 );
@@ -316,8 +318,6 @@ public class ObjectSlotTest {
 				value_received_latch.countDown();
 			}
 		} );
-
-		long start = System.currentTimeMillis();
 
 		SharedThreadPool.INSTANCE.schedule( () -> slot.set( "Hi" ), 1, TimeUnit.SECONDS );
 
@@ -342,6 +342,8 @@ public class ObjectSlotTest {
 
 		ObjectSlot<String> slot = new ObjectSlot<>();
 
+		long start = System.currentTimeMillis();
+
 		SharedThreadPool.INSTANCE.execute( () -> {
 			try {
 				String value = slot.waitForValue( 1000 );
@@ -355,8 +357,6 @@ public class ObjectSlotTest {
 				value_received_latch.countDown();
 			}
 		} );
-
-		long start = System.currentTimeMillis();
 
 		boolean done = value_received_latch.await( 3, TimeUnit.SECONDS );
 		assertTrue( done );

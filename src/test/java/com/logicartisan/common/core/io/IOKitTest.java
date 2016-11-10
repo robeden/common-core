@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-package com.logicartisan.common.core;
+package com.logicartisan.common.core.io;
 
 import junit.framework.TestCase;
 
