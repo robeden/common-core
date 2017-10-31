@@ -3,10 +3,9 @@ package com.logicartisan.common.core.thread;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import static java.util.Objects.requireNonNull;
 
@@ -25,20 +24,30 @@ import static java.util.Objects.requireNonNull;
  * </ul>
  */
 public class SingleThreadRepeatingTask implements Runnable {
+
+
 	private final Executor executor;
 	private final Runnable action;
 	private final Consumer<Throwable> error_handler;
 
 	private final Runnable inner_runner = new InnerRunner();
 
-	private final Lock logic_lock = new ReentrantLock();
-	private volatile boolean run_requested = false;
-	private volatile boolean thread_running = false;
+	private enum State {
+		/** No requests, no processor (thread) running. */
+		IDLE,
+		/** No requests, processor (thread) is running. */
+		PROCESSOR_RUNNING,
+		/** Request(s) pending, processor (thread) is running. */
+		PROCESSOR_RUNNING_REQUEST_PENDING
+	}
+	private final AtomicReference<State> state = new AtomicReference<>( State.IDLE );
+
 
 	/**
 	 * @param executor      Executor which will run the action.
 	 * @param action        Action to be run.
 	 */
+	@SuppressWarnings( "WeakerAccess" )
 	public SingleThreadRepeatingTask( @Nonnull Executor executor,
 		@Nonnull Runnable action ) {
 
@@ -49,6 +58,7 @@ public class SingleThreadRepeatingTask implements Runnable {
 	 * @param executor      Executor which will run the action.
 	 * @param action        Action to be run.
 	 */
+	@SuppressWarnings( "WeakerAccess" )
 	public SingleThreadRepeatingTask( @Nonnull Executor executor,
 		@Nonnull Runnable action,
 		@Nonnull Consumer<Throwable> error_handler ) {
@@ -64,22 +74,8 @@ public class SingleThreadRepeatingTask implements Runnable {
 	 */
 	@Override
 	public void run() {
-		boolean should_run_task = false;
-
-		logic_lock.lock();
-		try {
-			run_requested = true;
-
-			if ( !thread_running ) {
-				thread_running = true;
-				should_run_task = true;
-			}
-		}
-		finally {
-			logic_lock.unlock();
-		}
-
-		if ( should_run_task ) {
+		State old_state = state.getAndSet( State.PROCESSOR_RUNNING_REQUEST_PENDING );
+		if ( old_state == State.IDLE ) {
 			boolean abend = true;
 			try {
 				executor.execute( inner_runner );
@@ -89,13 +85,7 @@ public class SingleThreadRepeatingTask implements Runnable {
 				// If something weird happens, make sure we're not stuck in a bad state.
 				// This will at least ensure the task runs next time.
 				if ( abend ) {
-					logic_lock.lock();
-					try {
-						thread_running = false;
-					}
-					finally {
-						logic_lock.unlock();
-					}
+					state.set( State.IDLE );
 				}
 			}
 		}
@@ -105,55 +95,30 @@ public class SingleThreadRepeatingTask implements Runnable {
 	private class InnerRunner implements Runnable {
 		@Override
 		public void run() {
-			boolean run_again = false;
-			do {
-				try {
-					run_requested = false;
+			UnaryOperator<State> state_updater = ( state_before_update ) -> {
+				switch ( state_before_update ) {
+					default:
+						assert false: "Unknown state type: " + state_before_update;
+					case IDLE:
+					case PROCESSOR_RUNNING:
+						return State.IDLE;
 
+					case PROCESSOR_RUNNING_REQUEST_PENDING:
+						return State.PROCESSOR_RUNNING;
+
+				}
+			};
+
+			while( state.getAndUpdate( state_updater ) ==
+				State.PROCESSOR_RUNNING_REQUEST_PENDING ) {
+
+				try {
 					action.run();
 				}
 				catch( Throwable t ) {
 					error_handler.accept( t );
 				}
-				finally {
-					logic_lock.lock();
-					try {
-						if ( run_requested ) {
-							run_requested = false;
-							run_again = true;
-						}
-						else {
-							thread_running = false;
-							run_again = false;
-						}
-					}
-					finally {
-						logic_lock.unlock();
-					}
-				}
 			}
-			while( run_again );
-		}
-	}
-
-
-
-	public static void main( String[] args ) {
-		AtomicInteger counter = new AtomicInteger( 0 );
-
-		SingleThreadRepeatingTask task = new SingleThreadRepeatingTask(
-			SharedThreadPool.INSTANCE, () -> {
-				System.out.println( "Run: " + counter.getAndIncrement() );
-			ThreadKit.sleep( 1000 );
-			} );
-
-		while( true ) {
-			for( int i = 0; i < 15; i++ ) {
-				task.run();
-				ThreadKit.sleep( 100 );
-			}
-			System.out.println( "   Long sleep" );
-			ThreadKit.sleep( 5000 );
 		}
 	}
 }
