@@ -22,12 +22,12 @@ Download [the latest JAR][1] or grab via Maven:
 <dependency>
   <groupId>com.logicartisan</groupId>
   <artifactId>common-core</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.logicartisan:common-core:1.1.0'
+compile 'com.logicartisan:common-core:1.1.1'
 ```
 
 
