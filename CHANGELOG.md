@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Greatly simplify logic in in `SingleThreadRepeatingTask` to resolve a possible
   race condition.
+  
+### Changed
+- Deprecate many things in `IOKit`: `close` variations, `copy` variations, 
+  `isBeingDeserialized()` and `DESERIALIZATION_HINT`. 
+
 
 ## [1.1.0] - 2016-11-02
 ### Added
@@ -17,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Move `IOKit` from the `com.logicartisan.common.core.io` package to 
   `com.logicartisan.common.core`. 
+
 
 ## [1.0.0] - 2016-10-31
 - Initial release, slimmed down from
