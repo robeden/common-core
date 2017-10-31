@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Deprecate many things in `IOKit`: `close` variations, `copy` variations, 
   `isBeingDeserialized()` and `DESERIALIZATION_HINT`. 
+- Deprecate mutability methods of `Pair` and `Triple`. 
+  **WARNING**: Serialization support will also be removed in 1.2.  
 
 
 ## [1.1.0] - 2016-11-02

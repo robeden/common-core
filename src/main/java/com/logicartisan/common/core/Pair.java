@@ -29,6 +29,10 @@ public class Pair<A, B> implements Externalizable {
 		this.two = two;
 	}
 
+	/**
+	 * @deprecated Pair will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public Pair() {
 	}
 
@@ -37,6 +41,12 @@ public class Pair<A, B> implements Externalizable {
 		return one;
 	}
 
+
+
+	/**
+	 * @deprecated Pair will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public void setOne( A one ) {
 		this.one = one;
 	}
@@ -45,11 +55,19 @@ public class Pair<A, B> implements Externalizable {
 		return two;
 	}
 
+	/**
+	 * @deprecated Pair will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public void setTwo( B two ) {
 		this.two = two;
 	}
 
 
+	/**
+	 * @deprecated Pair will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public void set( A one, B two ) {
 		this.one = one;
 		this.two = two;
