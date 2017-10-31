@@ -26,6 +26,10 @@ public class Triple<A, B, C> implements Externalizable {
 	private C three;
 
 
+	/**
+	 * @deprecated Triple will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public Triple() {}
 
 	public Triple( A one, B two, C three ) {
@@ -39,6 +43,10 @@ public class Triple<A, B, C> implements Externalizable {
 		return one;
 	}
 
+	/**
+	 * @deprecated Triple will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public void setOne( A one ) {
 		this.one = one;
 	}
@@ -48,6 +56,10 @@ public class Triple<A, B, C> implements Externalizable {
 		return two;
 	}
 
+	/**
+	 * @deprecated Triple will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public void setTwo( B two ) {
 		this.two = two;
 	}
@@ -57,6 +69,10 @@ public class Triple<A, B, C> implements Externalizable {
 		return three;
 	}
 
+	/**
+	 * @deprecated Triple will be made immutable in 1.2.
+	 */
+	@Deprecated
 	public void setThree( C three ) {
 		this.three = three;
 	}
