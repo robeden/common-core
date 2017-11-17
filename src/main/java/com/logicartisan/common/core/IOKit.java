@@ -28,7 +28,10 @@ public class IOKit {
 	 * incorrectly or the results of {@link #isBeingDeserialized()} will be incorrect.
 	 * If this is not used, the results will still be correct (so don't use it unless
 	 * you're certain of what you're doing), but the performance will be worse.
+	 *
+	 * @deprecated  Will be removed with {@link #isBeingDeserialized()}.
 	 */
+	@Deprecated
 	public static final ThreadLocal<Boolean> DESERIALIZATION_HINT =
 		new ThreadLocal<Boolean>();
 
@@ -52,7 +55,10 @@ public class IOKit {
 	 *
 	 * @return  True if the target closed without error. If the argument was null, that
 	 *          also is treated as error-free.
+	 *
+	 * @deprecated      Slated for removal in 1.2.
 	 */
+	@Deprecated
 	public static boolean close( @Nullable Closeable closeable ) {
 		if ( closeable == null ) return true;
 		try {
@@ -70,7 +76,10 @@ public class IOKit {
 	 *
 	 * @return  True if the target closed without error. If the argument was null, that
 	 *          also is treated as error-free.
+	 *
+	 * @deprecated      Slated for removal in 1.2.
 	 */
+	@Deprecated
 	public static boolean close( ObjectInput input ) {
 		if ( input == null ) return true;
 		try {
@@ -87,7 +96,10 @@ public class IOKit {
 	 *
 	 * @return  True if the target closed without error. If the argument was null, that
 	 *          also is treated as error-free.
+	 *
+	 * @deprecated      Slated for removal in 1.2.
 	 */
+	@Deprecated
 	public static boolean close( ObjectOutput output ) {
 		if ( output == null ) return true;
 		try {
@@ -156,7 +168,10 @@ public class IOKit {
 	 *     }
 	 * }
 	 * </pre>
+	 *
+	 * @deprecated      Slated for removal in 1.2.
 	 */
+	@Deprecated
 	public static boolean isBeingDeserialized() {
 		Boolean hint = DESERIALIZATION_HINT.get();
 		if ( hint != null ) return hint.booleanValue();
@@ -212,7 +227,10 @@ public class IOKit {
 	 * Copy the contents of one stream to another. Note this will NOT close the streams.
 	 *
 	 * @return      The number of bytes copied.
+	 *
+	 * @deprecated Use Guava's ByteStreams functions.
 	 */
+	@Deprecated
 	public static long copy( InputStream input, OutputStream output ) throws IOException {
 		byte[] buffer = new byte[10240];
 
@@ -237,7 +255,10 @@ public class IOKit {
 	 * Copy the contents of one stream to another. Note this will NOT close the streams.
 	 *
 	 * @return      The number of bytes copied.
+	 *
+	 * @deprecated Use Guava's ByteStreams functions.
 	 */
+	@Deprecated
 	public static long copy( Reader input, Writer output ) throws IOException {
 		char[] buffer = new char[10240];
 
@@ -269,7 +290,10 @@ public class IOKit {
 	 *                  which case a temporary (64k) one will be created.
 	 *
 	 * @return      The number of bytes copied.
+	 *
+	 * @deprecated Use Guava's ByteStreams functions.
 	 */
+	@Deprecated
 	public static long copy( ReadableByteChannel input, WritableByteChannel output,
 		ByteBuffer buffer ) throws IOException {
 
