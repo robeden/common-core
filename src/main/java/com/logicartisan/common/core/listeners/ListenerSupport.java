@@ -5,13 +5,18 @@
 
 package com.logicartisan.common.core.listeners;
 
+import com.logicartisan.common.core.thread.SharedThreadPool;
+
+import javax.annotation.Nullable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.requireNonNull;
 
 
 /**
  * This interface provides management and message dispatching to a set of listeners.
- * Instances are obtained via {@link ListenerSupportFactory}.
+ * Instances are obtained via a builder from {@link #forType(Class)}.
  * <p></p>
  * There are two kinds of operations on a ListenerSupport object: listener management and
  * message dispatching. Listener management operations are all done directly on the
@@ -50,19 +55,18 @@ import java.util.concurrent.TimeUnit;
  *      }
  *   }
  * </pre>
- *
- * @see ListenerSupportFactory
  */
+@SuppressWarnings( "unused" )
 public interface ListenerSupport<T, A> {
 	/**
 	 * Add a new listener.
 	 */
-	public void add( T listener );
+	void add( T listener );
 
 	/**
 	 * Add a new listener with the given attachment.
 	 */
-	public void add( T listener, A attachment );
+	void add( T listener, @Nullable A attachment );
 
 	/**
 	 * Remove a listener.
@@ -70,17 +74,17 @@ public interface ListenerSupport<T, A> {
 	 * @return      True if this was the last listener (i.e., after removing the listener
 	 *              there are none left).
 	 */
-	public boolean remove( T listener );
+	boolean remove( T listener );
 
 	/**
 	 * Remove all listeners.
 	 */
-	public void removeAllListeners();
+	void removeAllListeners();
 
 	/**
 	 * Indicate whether or not there are listeners registered.
 	 */
-	public boolean hasListeners();
+	boolean hasListeners();
 
 
 	/**
@@ -93,29 +97,30 @@ public interface ListenerSupport<T, A> {
 	 * <p></p>
 	 * This method will never return null and will not throw exceptions.
 	 */
-	public T dispatch();
+	T dispatch();
 
 
 	/**
 	 * Return the attachment for a listener.
 	 */
-	public A getAttachment( T listener );
+	A getAttachment( T listener );
 
 
 	/**
 	 * Set the filter that will control dispatching of events to listeners based on
 	 * attachments.
 	 */
-	public void setListenerFilter( ListenerFilter<A> filter );
+	void setListenerFilter( ListenerFilter<A> filter );
 
 
 
-	public static <L,A> Builder<L,A> forType( Class<L> listener_class ) {
+	static <L,A> Builder<L,A> forType( Class<L> listener_class ) {
 		return new Builder<>( listener_class );
 	}
 
 
-	public static class Builder<L,A> {
+	@SuppressWarnings( { "UnnecessaryUnboxing", "WeakerAccess" } )
+	class Builder<L,A> {
 		private final Class<L> listener_class;
 
 		private Executor executor;
@@ -147,19 +152,22 @@ public interface ListenerSupport<T, A> {
 
 
 		public Builder<L,A> asynchronous() {
-			return executor( ListenerSupportImpl.SHARED_NOTIFICATION_POOL );
+			return executor( SharedThreadPool.INSTANCE );
 		}
 
 		public Builder<L,A> executor( Executor executor ) {
-			assert executor != null : "Executor has already been set: " + this.executor;
+			if ( this.executor != null ) {
+				throw new IllegalStateException(
+					"Executor has already been set: " + this.executor );
+			}
 
-			this.executor = executor;
+			this.executor = requireNonNull( executor );
 			return this;
 		}
 
 
 		public Builder<L,A> errorHandler( MessageDeliveryErrorHandler<L> handler ) {
-			this.error_handler = handler;
+			this.error_handler = requireNonNull( handler );
 			return this;
 		}
 
@@ -170,7 +178,7 @@ public interface ListenerSupport<T, A> {
 
 		public Builder<L,A> delay( long delay, TimeUnit unit ) {
 			this.delay = delay;
-			this.delay_unit = unit;
+			this.delay_unit = requireNonNull( unit );
 			return this;
 		}
 

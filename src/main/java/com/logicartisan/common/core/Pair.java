@@ -4,84 +4,60 @@
  */
 package com.logicartisan.common.core;
 
+import javax.annotation.Nullable;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Optional;
 
 
 /**
- *
+ * An immutable pair of objects.
  */
-public class Pair<A, B> implements Externalizable {
-	static final long serialVersionUID = 0L;
-	
+public class Pair<A, B> {
+	/**
+	 * Synonym for {@link Pair#Pair(Object, Object) new Pair(one,two)}.
+	 */
 	public static <A, B> Pair<A, B> create( A one, B two ) {
-		return new Pair<A, B>( one, two );
+		return new Pair<>( one, two );
 	}
 
 
-	private A one;
-	private B two;
+	private final A one;
+	private final B two;
 
-	public Pair( A one, B two ) {
+	@SuppressWarnings( "WeakerAccess" )
+	public Pair( @Nullable A one, @Nullable B two ) {
 		this.one = one;
 		this.two = two;
 	}
 
-	/**
-	 * @deprecated Pair will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public Pair() {
-	}
 
-
-	public A getOne() {
+	public @Nullable A getOne() {
 		return one;
 	}
 
-
-
-	/**
-	 * @deprecated Pair will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public void setOne( A one ) {
-		this.one = one;
+	public Optional<A> getOneSafe() {
+		return Optional.ofNullable( one );
 	}
 
-	public B getTwo() {
+
+	public @Nullable B getTwo() {
 		return two;
 	}
 
-	/**
-	 * @deprecated Pair will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public void setTwo( B two ) {
-		this.two = two;
-	}
-
-
-	/**
-	 * @deprecated Pair will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public void set( A one, B two ) {
-		this.one = one;
-		this.two = two;
+	public Optional<B> getTwoSafe() {
+		return Optional.ofNullable( two );
 	}
 
 
 	@Override
 	public String toString() {
-		StringBuilder buf = new StringBuilder( "{" );
-		buf.append( String.valueOf( one ) );
-		buf.append( "," );
-		buf.append( String.valueOf( two ) );
-		buf.append( "}" );
-		return buf.toString();
+		return "{" + String.valueOf( one ) +
+			"," +
+			String.valueOf( two ) +
+			"}";
 	}
 
 	@Override
@@ -102,33 +78,5 @@ public class Pair<A, B> implements Externalizable {
 		int result = one != null ? one.hashCode() : 0;
 		result = 31 * result + ( two != null ? two.hashCode() : 0 );
 		return result;
-	}
-
-
-	@SuppressWarnings( { "unchecked" } )
-	@Override
-	public void readExternal( ObjectInput in )
-		throws IOException, ClassNotFoundException {
-
-		// VERSION
-		in.readByte();
-
-		// ONE
-		one = ( A ) in.readObject();
-
-		// TWO
-		two = ( B ) in.readObject();
-	}
-
-	@Override
-	public void writeExternal( ObjectOutput out ) throws IOException {
-		// VERSION
-		out.writeByte( 0 );
-
-		// ONE
-		out.writeObject( one );
-
-		// TWO
-		out.writeObject( two );
 	}
 }

@@ -5,12 +5,12 @@
 
 package com.logicartisan.common.core.listeners;
 
-import com.logicartisan.common.core.thread.NamingThreadFactory;
 import com.logicartisan.common.core.thread.ScheduledExecutor;
 import com.logicartisan.common.core.thread.ThreadKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
@@ -48,18 +46,6 @@ class ListenerSupportImpl<T, A> implements ListenerSupport<T, A>, InvocationHand
 			// ignore
 		}
 	}
-
-	// These are here because statics can't be in ListenerSupport. They logically belong
-	// to the builder.
-	private static final int CORE_POOL_SIZE = Integer.getInteger(
-		"com.starlight.listeners.core_pool_size", 3 ).intValue();
-	private static final long KEEP_ALIVE_TIME = Long.getLong(
-		"com.starlight.listeners.keep_alive_time", 10000L ).longValue();
-	static final Executor SHARED_NOTIFICATION_POOL = new ThreadPoolExecutor(
-		CORE_POOL_SIZE, Integer.MAX_VALUE, KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS,
-		new SynchronousQueue<>(),
-		new NamingThreadFactory( "ListenerSupport Notifier", true ) );
-
 
 
 	private final Executor executor;
@@ -101,7 +87,7 @@ class ListenerSupportImpl<T, A> implements ListenerSupport<T, A>, InvocationHand
 	}
 
 	@Override
-	public void add( T listener, A attachment ) {
+	public void add( T listener, @Nullable A attachment ) {
 		Objects.requireNonNull( listener );
 
 		listener_info_map_lock.lock();

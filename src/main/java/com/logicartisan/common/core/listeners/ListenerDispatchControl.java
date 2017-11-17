@@ -9,6 +9,7 @@ import com.logicartisan.common.core.thread.ThreadKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Queue;
@@ -60,9 +61,9 @@ class ListenerDispatchControl<T, A> implements Runnable {
 
 
 
-	ListenerDispatchControl(T listener, int max_backlog_size,
+	ListenerDispatchControl( T listener, int max_backlog_size,
         MessageDeliveryErrorHandler<T> error_handler, RemoveSupport<T> remove_support,
-        A attachment, AtomicReference<ListenerFilter<A>> filter_reference) {
+        @Nullable A attachment, AtomicReference<ListenerFilter<A>> filter_reference ) {
 
 		this.listener = listener;
 		this.error_handler = error_handler;
@@ -163,8 +164,6 @@ class ListenerDispatchControl<T, A> implements Runnable {
 		boolean retry_message = false;
 
 		while ( retry_message || ( info = message_queue.poll() ) != null ) {
-			assert !retry_message || info != null : "Told to retry null message";
-
 			// Clear the retry flag
 			retry_message = false;
 
@@ -280,5 +279,26 @@ class ListenerDispatchControl<T, A> implements Runnable {
 		 * Return true if this is the last listener.
 		 */
 		boolean removeListener( T listener );
+	}
+
+
+
+	static class MessageInfo {
+		private final Method method;
+		private final Object[] args;
+
+		MessageInfo( Method method, Object[] args ) {
+			this.method = method;
+			this.args = args;
+		}
+
+
+		Method getMethod() {
+			return method;
+		}
+
+		Object[] getArgs() {
+			return args;
+		}
 	}
 }

@@ -19,6 +19,7 @@ public class NamingThreadFactory implements ThreadFactory {
 	private final boolean daemon;
 
 
+	@SuppressWarnings( "WeakerAccess" )
 	public NamingThreadFactory( String name_prefix ) {
 		this( name_prefix, true );
 	}

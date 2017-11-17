@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 /**
  * Useful static functions for dealing with threads.
  */
+@SuppressWarnings( "WeakerAccess" )
 public class ThreadKit {
 	private ThreadKit() {}
 

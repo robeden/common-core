@@ -27,7 +27,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * An ObjectSlot is similar to {@link java.util.concurrent.atomic.AtomicReference} but
- * also allows addition features such as waiting for particular values.
+ * also allows additional features such as waiting for particular values.
  * <p></p>
  * WARNING: These features come at a performance price as this is a heavier-weight
  * implementation than its atomic counterpart both in terms of performance (a Lock is
@@ -54,7 +54,7 @@ public class ObjectSlot<V> implements Supplier<V>, Consumer<V> {
 	/**
 	 * Create with an initial value.
 	 */
-	public ObjectSlot( V value ) {
+	public ObjectSlot( @Nullable V value ) {
 		this.value = value;
 	}
 

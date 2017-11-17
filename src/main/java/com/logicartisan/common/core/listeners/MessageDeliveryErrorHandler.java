@@ -5,12 +5,14 @@
 
 package com.logicartisan.common.core.listeners;
 
+import javax.annotation.Nonnull;
+
+
 /**
  * Interface to deal with errors when dispatching messages to listeners.
  *
- * @see ListenerSupportFactory
+ * @see ListenerSupport
  */
-@SuppressWarnings("WeakerAccess")
 public interface MessageDeliveryErrorHandler<T> {
 	/**
 	 * Things we can do.
@@ -38,7 +40,7 @@ public interface MessageDeliveryErrorHandler<T> {
 	 *                              delivery will never succeed.
 	 * @return The response to the errors; will not be null.
 	 */
-	ErrorResponse deliveryError( T listener, Throwable throwable,
+	ErrorResponse deliveryError( @Nonnull T listener, @Nonnull Throwable throwable,
 		int overall_error_count, int overall_success_count,
 		int consecutive_errors, boolean fatal );
 
@@ -57,8 +59,9 @@ public interface MessageDeliveryErrorHandler<T> {
 	 *         problems for the caller in the event that the listener is stuck and no
 	 *         messages are being delivered.
 	 */
-	default ErrorResponse excessiveBacklog( T listener, int backlog_size,
+	default ErrorResponse excessiveBacklog( @Nonnull T listener, int backlog_size,
 		int consecutive_backlog_errors ) {
+
 		return ErrorResponse.RETRY_MESSAGE;
 	}
 

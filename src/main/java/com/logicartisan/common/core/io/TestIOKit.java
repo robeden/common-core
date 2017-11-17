@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 /**
  * IO functions geared toward testing.
  */
+@SuppressWarnings( { "WeakerAccess", "unused" } )
 public class TestIOKit {
 	private static final int COLUMNS = 80;
 
@@ -18,8 +19,8 @@ public class TestIOKit {
 	 *
 	 * @see #readTestFile(Reader)
 	 */
-	public static void writeTestFile( @Nonnull Writer writer, @Nullable String comment,
-		@Nonnull byte[] data ) throws IOException {
+	public static void writeTestFile( Writer writer, @Nullable String comment,
+		byte[] data ) throws IOException {
 
 		try( PrintWriter out = new PrintWriter( writer ) ) {
 			if ( comment != null ) {
@@ -95,16 +96,10 @@ public class TestIOKit {
 	public static Object deserialize( byte[] data )
 		throws IOException, ClassNotFoundException {
 
-		Boolean previous_value = IOKit.DESERIALIZATION_HINT.get();
-		IOKit.DESERIALIZATION_HINT.set( Boolean.TRUE );
 		try ( ByteArrayInputStream bin = new ByteArrayInputStream( data );
 			ObjectInputStream in = new ObjectInputStream( bin ) ) {
 
 			return in.readObject();
-		}
-		finally {
-			if ( previous_value == null ) IOKit.DESERIALIZATION_HINT.remove();
-			else IOKit.DESERIALIZATION_HINT.set( previous_value );
 		}
 	}
 

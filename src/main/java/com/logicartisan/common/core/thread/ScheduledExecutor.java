@@ -23,7 +23,7 @@ public interface ScheduledExecutor extends Executor {
      *         scheduled for execution
      * @throws NullPointerException if command is null
      */
-    public ScheduledFuture<?> schedule( Runnable command,
+    ScheduledFuture<?> schedule( Runnable command,
 	    long delay, TimeUnit unit );
 
     /**
@@ -38,7 +38,7 @@ public interface ScheduledExecutor extends Executor {
      *         scheduled for execution
      * @throws NullPointerException if callable is null
      */
-    public <V> ScheduledFuture<V> schedule( Callable<V> callable,
+    <V> ScheduledFuture<V> schedule( Callable<V> callable,
 	    long delay, TimeUnit unit );
 
     /**
@@ -66,7 +66,7 @@ public interface ScheduledExecutor extends Executor {
      * @throws NullPointerException if command is null
      * @throws IllegalArgumentException if period less than or equal to zero
      */
-    public ScheduledFuture<?> scheduleAtFixedRate( Runnable command,
+    ScheduledFuture<?> scheduleAtFixedRate( Runnable command,
 	    long initialDelay,
 	    long period,
 	    TimeUnit unit );
@@ -93,7 +93,7 @@ public interface ScheduledExecutor extends Executor {
      * @throws NullPointerException if command is null
      * @throws IllegalArgumentException if delay less than or equal to zero
      */
-    public ScheduledFuture<?> scheduleWithFixedDelay( Runnable command,
+    ScheduledFuture<?> scheduleWithFixedDelay( Runnable command,
 	    long initialDelay,
 	    long delay,
 	    TimeUnit unit );

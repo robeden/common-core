@@ -4,90 +4,73 @@
  */
 package com.logicartisan.common.core;
 
+import javax.annotation.Nullable;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Optional;
 
 
 /**
  *
  */
-public class Triple<A, B, C> implements Externalizable {
-	static final long serialVersionUID = 0L;
-
+public class Triple<A, B, C> {
+	/**
+	 * Synonym for {@link Triple#Triple(Object, Object, Object)}  new Triple(one,two,three)}.
+	 */
 	public static <A, B, C> Triple<A, B, C> create( A one, B two, C three ) {
-		return new Triple<A, B, C>( one, two, three );
+		return new Triple<>( one, two, three );
 	}
 
 
-	private A one;
-	private B two;
-	private C three;
+	private final A one;
+	private final B two;
+	private final C three;
 
-
-	/**
-	 * @deprecated Triple will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public Triple() {}
-
-	public Triple( A one, B two, C three ) {
+	@SuppressWarnings( "WeakerAccess" )
+	public Triple( @Nullable A one, @Nullable B two, @Nullable C three ) {
 		this.one = one;
 		this.two = two;
 		this.three = three;
 	}
 
 
-	public A getOne() {
+	public @Nullable A getOne() {
 		return one;
 	}
 
-	/**
-	 * @deprecated Triple will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public void setOne( A one ) {
-		this.one = one;
+	public Optional<A> getOneSafe() {
+		return Optional.ofNullable( one );
 	}
 
 
-	public B getTwo() {
+	public @Nullable B getTwo() {
 		return two;
 	}
 
-	/**
-	 * @deprecated Triple will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public void setTwo( B two ) {
-		this.two = two;
+	public Optional<B> getTwoSafe() {
+		return Optional.ofNullable( two );
 	}
 
 
-	public C getThree() {
+	public @Nullable C getThree() {
 		return three;
 	}
 
-	/**
-	 * @deprecated Triple will be made immutable in 1.2.
-	 */
-	@Deprecated
-	public void setThree( C three ) {
-		this.three = three;
+	public Optional<C> getThreeSafe() {
+		return Optional.ofNullable( three );
 	}
 
 
 	@Override
 	public String toString() {
-		StringBuilder buf = new StringBuilder( "{" );
-		buf.append( String.valueOf( one ) );
-		buf.append( "," );
-		buf.append( String.valueOf( two ) );
-		buf.append( "," );
-		buf.append( String.valueOf( three ) );
-		buf.append( "}" );
-		return buf.toString();
+		return "{" + String.valueOf( one ) +
+			"," +
+			String.valueOf( two ) +
+			"," +
+			String.valueOf( three ) +
+			"}";
 	}
 
 
@@ -112,38 +95,5 @@ public class Triple<A, B, C> implements Externalizable {
 		result = 31 * result + ( two != null ? two.hashCode() : 0 );
 		result = 31 * result + ( three != null ? three.hashCode() : 0 );
 		return result;
-	}
-
-
-	@Override
-	public void readExternal( ObjectInput in )
-		throws IOException, ClassNotFoundException {
-
-		// VERSION
-		in.readByte();
-
-		// ONE
-		one = ( A ) in.readObject();
-
-		// TWO
-		two = ( B ) in.readObject();
-
-		// THREE
-		three = ( C ) in.readObject();
-	}
-
-	@Override
-	public void writeExternal( ObjectOutput out ) throws IOException {
-		// VERSION
-		out.writeByte( 0 );
-
-		// ONE
-		out.writeObject( one );
-
-		// TWO
-		out.writeObject( two );
-
-		// THREE
-		out.writeObject( three );
 	}
 }

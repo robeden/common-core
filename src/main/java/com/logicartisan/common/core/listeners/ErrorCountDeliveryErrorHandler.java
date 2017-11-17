@@ -9,15 +9,15 @@ package com.logicartisan.common.core.listeners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+
 
 /**
  * Simple error handler that removes listeners after a given number of consecutive errors
  * (or when fatal error occur).
  */
+@SuppressWarnings( "WeakerAccess" )
 public class ErrorCountDeliveryErrorHandler<T> implements MessageDeliveryErrorHandler<T> {
-	private static final boolean ERROR_DEBUG =
-		System.getProperty( "starlight.listeners.print_dispatch_errors" ) != null;
-
 	private static final Logger LOG =
 		LoggerFactory.getLogger( ErrorCountDeliveryErrorHandler.class );
 
@@ -49,29 +49,21 @@ public class ErrorCountDeliveryErrorHandler<T> implements MessageDeliveryErrorHa
 
 		// Special-case AssertionError logging so it's seen during unit tests
 		if ( throwable instanceof AssertionError ) {
-			LOG.error( "Listener delivery error (fatal:{} consecutive_errors:{} " +
-				"max_error_count:{}", Boolean.valueOf( fatal ),
+			LOG.warn( "Listener delivery error (fatal:{} consecutive_errors:{} " +
+				"max_error_count:{})", Boolean.valueOf( fatal ),
 				Integer.valueOf( consecutive_errors ), Integer.valueOf( max_error_count ),
 				throwable );
 		}
 		else if ( LOG.isDebugEnabled() ) {
 			LOG.debug( "Listener delivery error (fatal:{} consecutive_errors:{} " +
-				"max_error_count:{}", Boolean.valueOf( fatal ),
+				"max_error_count:{})", Boolean.valueOf( fatal ),
 				Integer.valueOf( consecutive_errors ), Integer.valueOf( max_error_count ),
 				throwable );
 		}
-		if ( ERROR_DEBUG ) {
-			synchronized ( System.err ) {
-				System.err.println( "Listener delivery error (fatal: " + fatal +
-					"  consecutive_errors: " + consecutive_errors +
-					"  max_error_count: " + max_error_count + "  error: " + throwable );
-				throwable.printStackTrace( System.err );
-			}
-		}
 
 		if ( fatal || consecutive_errors >= max_error_count ) {
-			LOG.info( "Listener being removed due to dispatch errors: {}", listener,
-				throwable );
+			LOG.info( "Listener being removed due to dispatch errors: {}",
+				listener, throwable );
 			return ErrorResponse.REMOVE_LISTENER;
 		}
 		else {
@@ -89,14 +81,4 @@ public class ErrorCountDeliveryErrorHandler<T> implements MessageDeliveryErrorHa
 
 	@Override
 	public void lastListenerRemoved() {}
-
-
-	private boolean isOrCausedBy( Throwable t, Class<? extends Throwable> ex_class ) {
-		while ( t != null ) {
-			if ( ex_class.isAssignableFrom( t.getClass() ) ) return true;
-			t = t.getCause();
-		}
-
-		return false;
-	}
 }

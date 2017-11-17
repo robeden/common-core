@@ -65,9 +65,9 @@ public class SingleThreadRepeatingTaskTest {
 			System.out.println( "Hammer thread exit" );
 		};
 
-		SharedThreadPool.INSTANCE.execute( hammer_thread );
-		SharedThreadPool.INSTANCE.execute( hammer_thread );
-		SharedThreadPool.INSTANCE.execute( hammer_thread );
+		SharedThreadPool.execute( hammer_thread );
+		SharedThreadPool.execute( hammer_thread );
+		SharedThreadPool.execute( hammer_thread );
 
 		latch.await();
 

@@ -5,6 +5,7 @@ import com.logicartisan.common.core.thread.ThreadKit;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,8 +78,8 @@ public class ListenerSupportTest {
 		MessageDeliveryErrorHandler<Runnable> test_handler =
 			new MessageDeliveryErrorHandler<Runnable>() {
 				@Override
-				public ErrorResponse deliveryError( Runnable listener,
-					Throwable throwable, int overall_error_count,
+				public ErrorResponse deliveryError( @Nonnull Runnable listener,
+					@Nonnull Throwable throwable, int overall_error_count,
 					int overall_success_count, int consecutive_errors, boolean fatal ) {
 
 					final int state = error_handler_state.get();

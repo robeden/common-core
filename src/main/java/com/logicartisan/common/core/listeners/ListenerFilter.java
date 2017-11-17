@@ -5,6 +5,8 @@
 
 package com.logicartisan.common.core.listeners;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 
 
@@ -12,5 +14,5 @@ import java.lang.reflect.Method;
  *
  */
 public interface ListenerFilter<A> {
-	public boolean callMatchesFilter( A attachment, Method method, Object[] args );
+	boolean callMatchesFilter( @Nullable A attachment, Method method, Object[] args );
 }

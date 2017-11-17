@@ -18,7 +18,7 @@ public class SharedThreadPoolTest extends TestCase {
 		TestRunnable runner = new TestRunnable( 3000 );
 
 		long start = System.currentTimeMillis();
-		SharedThreadPool.INSTANCE.execute( runner );
+		SharedThreadPool.execute( runner );
 
 		// Should return immediately
 		assertTrue( System.currentTimeMillis() - start < 1000 );
@@ -39,25 +39,23 @@ public class SharedThreadPoolTest extends TestCase {
 
 
 	public void testScheduleCallable() throws Exception {
-		TestCallable<String> callable = new TestCallable<String>( 3000, "Hello world" );
+		TestCallable<String> callable = new TestCallable<>( 3000, "Hello world" );
 
 		long start = System.currentTimeMillis();
 		final ScheduledFuture<String> future =
-			SharedThreadPool.INSTANCE.schedule( callable, 3, TimeUnit.SECONDS );
+			SharedThreadPool.schedule( callable, 3, TimeUnit.SECONDS );
 
-		final ObjectSlot<Long> future_return_time = new ObjectSlot<Long>();
-		final ObjectSlot<String> future_return_value = new ObjectSlot<String>();
-		new Thread() {
-			@Override public void run() {
-				try {
-					future_return_value.set( future.get( 10, TimeUnit.SECONDS ) );
-					future_return_time.set( Long.valueOf( System.currentTimeMillis() ) );
-				}
-				catch( Exception ex ) {
-					ex.printStackTrace();
-				}
+		final ObjectSlot<Long> future_return_time = new ObjectSlot<>();
+		final ObjectSlot<String> future_return_value = new ObjectSlot<>();
+		new Thread( () -> {
+			try {
+				future_return_value.set( future.get( 10, TimeUnit.SECONDS ) );
+				future_return_time.set( Long.valueOf( System.currentTimeMillis() ) );
 			}
-		}.start();
+			catch( Exception ex ) {
+				ex.printStackTrace();
+			}
+		} ).start();
 
 		assertFalse( future.isDone() );
 		assertFalse( future.isCancelled() );
@@ -97,20 +95,18 @@ public class SharedThreadPoolTest extends TestCase {
 
 		long start = System.currentTimeMillis();
 		final ScheduledFuture<?> future =
-			SharedThreadPool.INSTANCE.schedule( runner, 3, TimeUnit.SECONDS );
+			SharedThreadPool.schedule( runner, 3, TimeUnit.SECONDS );
 
-		final ObjectSlot<Long> future_return_time = new ObjectSlot<Long>();
-		new Thread() {
-			@Override public void run() {
-				try {
-					future.get();
-					future_return_time.set( Long.valueOf( System.currentTimeMillis() ) );
-				}
-				catch( Exception ex ) {
-					ex.printStackTrace();
-				}
+		final ObjectSlot<Long> future_return_time = new ObjectSlot<>();
+		new Thread( () -> {
+			try {
+				future.get();
+				future_return_time.set( Long.valueOf( System.currentTimeMillis() ) );
 			}
-		}.start();
+			catch( Exception ex ) {
+				ex.printStackTrace();
+			}
+		} ).start();
 
 		assertFalse( future.isDone() );
 		assertFalse( future.isCancelled() );
@@ -146,9 +142,9 @@ public class SharedThreadPoolTest extends TestCase {
 
 	public void testCancelWithInterrupt() throws Exception {
 		TestCallable<String> callable =
-			new TestCallable<String>( 5000, "Shouldn't get here" );
+			new TestCallable<>( 5000, "Shouldn't get here" );
 		ScheduledFuture<String> temp_future =
-			SharedThreadPool.INSTANCE.schedule( callable, 1, TimeUnit.SECONDS );
+			SharedThreadPool.schedule( callable, 1, TimeUnit.SECONDS );
 
 		// Schedule a task and cancel immediately
 		temp_future.cancel( true );
@@ -156,27 +152,25 @@ public class SharedThreadPoolTest extends TestCase {
 
 		// Schedule a new task and cancel while running
 		final ScheduledFuture<String> future =
-			SharedThreadPool.INSTANCE.schedule( callable, 1, TimeUnit.SECONDS );
+			SharedThreadPool.schedule( callable, 1, TimeUnit.SECONDS );
 
 		final AtomicBoolean canceled_flag = new AtomicBoolean( false );
 		final CountDownLatch return_latch = new CountDownLatch( 1 );
-		new Thread() {
-			@Override public void run() {
-				try {
-					future.get();
-				}
-				catch( CancellationException ex ) {
-					// This is good
-					canceled_flag.set( true );
-				}
-				catch( Exception ex ) {
-					ex.printStackTrace();
-				}
-				finally {
-					return_latch.countDown();
-				}
+		new Thread( () -> {
+			try {
+				future.get();
 			}
-		}.start();
+			catch( CancellationException ex ) {
+				// This is good
+				canceled_flag.set( true );
+			}
+			catch( Exception ex ) {
+				ex.printStackTrace();
+			}
+			finally {
+				return_latch.countDown();
+			}
+		} ).start();
 
 		ThreadKit.sleep( 1200 );
 
@@ -194,7 +188,7 @@ public class SharedThreadPoolTest extends TestCase {
 
 	public void testFixedRate() throws Exception {
 		TestRunnable runner = new TestRunnable( 500 );
-		ScheduledFuture<?> future = SharedThreadPool.INSTANCE.scheduleAtFixedRate(
+		ScheduledFuture<?> future = SharedThreadPool.scheduleAtFixedRate(
 			runner,
 			1, 1, TimeUnit.SECONDS );
 		long start_time = System.currentTimeMillis();
@@ -223,7 +217,7 @@ public class SharedThreadPoolTest extends TestCase {
 	// Task takes longer than the scheduled time to complete
 	public void testFixedRateOverlap() throws Exception {
 		TestRunnable runner = new TestRunnable( 1000 );
-		ScheduledFuture<?> future = SharedThreadPool.INSTANCE.scheduleAtFixedRate( runner,
+		ScheduledFuture<?> future = SharedThreadPool.scheduleAtFixedRate( runner,
 			300, 300, TimeUnit.MILLISECONDS );  // Will run at: 600, 900, 1200, 1500
 		try {
 			assertEquals( 0, runner.run_counter.get() );
@@ -254,7 +248,7 @@ public class SharedThreadPoolTest extends TestCase {
 
 	public void testFixedDelay() throws Exception {
 		TestRunnable runner = new TestRunnable( 500 );
-		ScheduledFuture<?> future = SharedThreadPool.INSTANCE.scheduleWithFixedDelay(
+		ScheduledFuture<?> future = SharedThreadPool.scheduleWithFixedDelay(
 			runner, 1, 1, TimeUnit.SECONDS );
 		final long start_time = System.currentTimeMillis();
 
@@ -279,41 +273,37 @@ public class SharedThreadPoolTest extends TestCase {
 
 
 	public void testNameRestoration() throws Exception {
-		final AtomicReference<String> original_name = new AtomicReference<String>();
-		final AtomicReference<Thread> original_thread = new AtomicReference<Thread>();
+		final AtomicReference<String> original_name = new AtomicReference<>();
+		final AtomicReference<Thread> original_thread = new AtomicReference<>();
 
 		final CountDownLatch latch1 = new CountDownLatch( 1 );
 
-		SharedThreadPool.INSTANCE.execute( new Runnable() {
-			@Override public void run() {
-				// Store the thread and original name
-				original_thread.set( Thread.currentThread() );
-				original_name.set( Thread.currentThread().getName() );
+		SharedThreadPool.execute( () -> {
+			// Store the thread and original name
+			original_thread.set( Thread.currentThread() );
+			original_name.set( Thread.currentThread().getName() );
 
-				Thread.currentThread().setName( "THIS NAME SHOULD BE RESET" );
+			Thread.currentThread().setName( "THIS NAME SHOULD BE RESET" );
 
-				latch1.countDown();
-			}
+			latch1.countDown();
 		} );
 
 		// Wait for the task to finish
 		assertTrue( "Timed out waiting for completion",
 			latch1.await( 3, TimeUnit.SECONDS ) );
 
-		final AtomicReference<String> new_name = new AtomicReference<String>();
-		final AtomicReference<Thread> new_thread = new AtomicReference<Thread>();
+		final AtomicReference<String> new_name = new AtomicReference<>();
+		final AtomicReference<Thread> new_thread = new AtomicReference<>();
 
 		final CountDownLatch latch2 = new CountDownLatch( 1 );
 
 		ThreadKit.sleep( 1000 );
 
-		SharedThreadPool.INSTANCE.execute( new Runnable() {
-			@Override public void run() {
-				new_thread.set( Thread.currentThread() );
-				new_name.set( Thread.currentThread().getName() );
+		SharedThreadPool.execute( () -> {
+			new_thread.set( Thread.currentThread() );
+			new_name.set( Thread.currentThread().getName() );
 
-				latch2.countDown();
-			}
+			latch2.countDown();
 		} );
 
 		// Wait for the task to finish
@@ -342,7 +332,7 @@ public class SharedThreadPoolTest extends TestCase {
 			future.cancel( false );
 		};
 
-		ScheduledFuture<?> future = SharedThreadPool.INSTANCE.scheduleWithFixedDelay(
+		ScheduledFuture<?> future = SharedThreadPool.scheduleWithFixedDelay(
 			runnable, 2, 2, TimeUnit.SECONDS );
 		future_slot.set( future );
 
@@ -357,7 +347,7 @@ public class SharedThreadPoolTest extends TestCase {
 		final CountDownLatch start_indicator;
 		final CountDownLatch end_indicator;
 
-		final AtomicReference<Thread> executing_thread = new AtomicReference<Thread>();
+		final AtomicReference<Thread> executing_thread = new AtomicReference<>();
 
 		final List<Long> run_times = new ArrayList<>();
 		final AtomicInteger run_counter = new AtomicInteger( 0 );
@@ -386,7 +376,7 @@ public class SharedThreadPoolTest extends TestCase {
 		final CountDownLatch start_indicator;
 		final CountDownLatch end_indicator;
 
-		final AtomicReference<Thread> executing_thread = new AtomicReference<Thread>();
+		final AtomicReference<Thread> executing_thread = new AtomicReference<>();
 
 		volatile boolean was_interrupted = false;
 
